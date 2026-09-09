@@ -1,5 +1,8 @@
 package org.booleanuk.app.dto.productDto;
 
-public class ProductResponse {
-    
+public record ProductResponse(
+        Long id,
+        String name,
+        Double price
+) {
 }
