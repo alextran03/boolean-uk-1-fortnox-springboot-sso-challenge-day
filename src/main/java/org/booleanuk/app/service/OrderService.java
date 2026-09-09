@@ -1,7 +1,6 @@
 package org.booleanuk.app.service;
 
 import org.booleanuk.app.dto.orderDto.CreateOrderRequest;
-import org.booleanuk.app.dto.orderDto.OrderResponse;
 import org.booleanuk.app.model.Customer;
 import org.booleanuk.app.model.Order;
 import org.booleanuk.app.model.Product;
@@ -29,20 +28,20 @@ public class OrderService {
         this.productRepo = productRepo;
     }
 
-    @Transactional(readOnly = true)
-    public List<OrderResponse> getAllOrders() {
-        return orderRepo.findAll().stream()
-                .map(OrderResponse::from)
-                .toList();
+    public List<Order> getAllOrders() {
+        return orderRepo.findAll();
     }
 
-    @Transactional(readOnly = true)
-    public OrderResponse getOrderById(Long id) {
-        return OrderResponse.from(findOrThrow(id));
+    public List<Order> getOrdersByValue() {
+        return orderRepo.findAllByOrderByTotalAmountDesc();
+    }
+
+    public Order getOrderById(Long id) {
+        return findOrThrow(id);
     }
 
     @Transactional
-    public OrderResponse createOrder(CreateOrderRequest request) {
+    public Order createOrder(CreateOrderRequest request) {
         Customer customer = findCustomer(request.customerId());
         List<Product> products = findProducts(request.productIds());
 
@@ -51,11 +50,11 @@ public class OrderService {
         order.setProducts(new HashSet<>(products));
         order.setTotalAmount(sumPrices(products));
 
-        return OrderResponse.from(orderRepo.save(order));
+        return orderRepo.save(order);
     }
 
     @Transactional
-    public OrderResponse updateOrder(Long id, CreateOrderRequest request) {
+    public Order updateOrder(Long id, CreateOrderRequest request) {
         Order order = findOrThrow(id);
         Customer customer = findCustomer(request.customerId());
         List<Product> products = findProducts(request.productIds());
@@ -64,14 +63,14 @@ public class OrderService {
         order.setProducts(new HashSet<>(products));
         order.setTotalAmount(sumPrices(products));
 
-        return OrderResponse.from(orderRepo.save(order));
+        return orderRepo.save(order);
     }
 
     public void deleteOrder(Long id) {
         orderRepo.delete(findOrThrow(id));
     }
 
-    // --- helpers --- (method)
+    // --- helpers ---
 
     private Order findOrThrow(Long id) {
         return orderRepo.findById(id)

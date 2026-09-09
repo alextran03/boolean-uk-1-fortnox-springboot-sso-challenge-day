@@ -3,6 +3,7 @@ package org.booleanuk.app.controller;
 import jakarta.validation.Valid;
 import org.booleanuk.app.dto.orderDto.CreateOrderRequest;
 import org.booleanuk.app.dto.orderDto.OrderResponse;
+import org.booleanuk.app.model.Order;
 import org.booleanuk.app.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,22 +30,32 @@ public class OrderController {
 
     @GetMapping
     public List<OrderResponse> getAll() {
-        return orderService.getAllOrders();
+        return orderService.getAllOrders().stream()
+                .map(OrderResponse::from)
+                .toList();
+    }
+
+    @GetMapping("/by-value")
+    public List<OrderResponse> getByValue() {
+        return orderService.getOrdersByValue().stream()
+                .map(OrderResponse::from)
+                .toList();
     }
 
     @GetMapping("/{id}")
     public OrderResponse getById(@PathVariable Long id) {
-        return orderService.getOrderById(id);
+        return OrderResponse.from(orderService.getOrderById(id));
     }
 
     @PostMapping
     public ResponseEntity<OrderResponse> create(@Valid @RequestBody CreateOrderRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrder(request));
+        Order created = orderService.createOrder(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(OrderResponse.from(created));
     }
 
     @PutMapping("/{id}")
     public OrderResponse update(@PathVariable Long id, @Valid @RequestBody CreateOrderRequest request) {
-        return orderService.updateOrder(id, request);
+        return OrderResponse.from(orderService.updateOrder(id, request));
     }
 
     @DeleteMapping("/{id}")

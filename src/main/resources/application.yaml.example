@@ -15,12 +15,16 @@ spring:
     max-idle: 5
   jpa:
     hibernate:
-      ddl-auto: update
+      # Flyway owns the schema - Hibernate only validates the entities against it
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
   security:
     oauth2:
       resourceserver:

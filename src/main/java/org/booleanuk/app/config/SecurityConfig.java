@@ -25,8 +25,7 @@ import java.util.Map;
  *   POST /orders            (create an order)
  *   PUT  /orders/{id}       (change an order)
  *
- * Everything else requires a valid Keycloak JWT. Method-level @PreAuthorize
- * is enabled for the ADMIN/USER role split in the extension task.
+ * Everything else requires a valid Keycloak JWT.
  */
 @Configuration
 @EnableMethodSecurity
@@ -40,6 +39,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // OpenAPI / Swagger
                 .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                // Sales statistics is private - must come before the public rule below
+                .requestMatchers(HttpMethod.GET, "/products/sales").authenticated()
                 // Public product reads
                 .requestMatchers(HttpMethod.GET, "/products", "/products/*").permitAll()
                 // Public order create + change
@@ -54,10 +55,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /**
-     * Maps Keycloak realm roles (realm_access.roles) onto Spring authorities
-     * as ROLE_USER / ROLE_ADMIN so hasRole(...) / @PreAuthorize work.
-     */
     private JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(SecurityConfig::extractRealmRoles);

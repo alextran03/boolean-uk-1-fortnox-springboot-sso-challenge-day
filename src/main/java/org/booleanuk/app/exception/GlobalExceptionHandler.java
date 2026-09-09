@@ -1,6 +1,7 @@
 package org.booleanuk.app.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -14,9 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Turns exceptions into a consistent {@link ApiError} JSON body across every controller.
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -49,7 +47,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
-    // e.g. GET /customers/abc where a Long id is expected. 
+    //GET /customers/abc where a Long id is expected. 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiError> handleTypeMismatch(MethodArgumentTypeMismatchException ex,
                                                        HttpServletRequest request) {
@@ -73,6 +71,18 @@ public class GlobalExceptionHandler {
                 ex.getReason() != null ? ex.getReason() : status.getReasonPhrase(),
                 request.getRequestURI());
         return ResponseEntity.status(status).body(body);
+    }
+
+    // FK / unique constraint violations, e.g. deleting a product still referenced by an order.
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiError> handleDataIntegrity(DataIntegrityViolationException ex,
+                                                        HttpServletRequest request) {
+        ApiError body = ApiError.of(
+                HttpStatus.CONFLICT.value(),
+                HttpStatus.CONFLICT.getReasonPhrase(),
+                "Resource is referenced by other records and cannot be modified or deleted",
+                request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
     // Last resort - never leak a stack trace to the client. */

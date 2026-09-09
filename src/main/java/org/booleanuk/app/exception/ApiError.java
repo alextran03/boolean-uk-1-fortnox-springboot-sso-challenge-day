@@ -5,10 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.Instant;
 import java.util.Map;
 
-/**
- * Uniform error body returned by {@link GlobalExceptionHandler}.
- * {@code fieldErrors} is only present for validation failures.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ApiError(
         Instant timestamp,
