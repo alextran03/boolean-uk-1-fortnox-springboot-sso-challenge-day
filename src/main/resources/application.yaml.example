@@ -23,8 +23,7 @@ spring:
     show-sql: true
   security:
     oauth2:
-      client:
-        resourceserver:
-          jwt:
-            issuer-uri: http://localhost:8080/realms/{realm-name}
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/{realm-name}
 

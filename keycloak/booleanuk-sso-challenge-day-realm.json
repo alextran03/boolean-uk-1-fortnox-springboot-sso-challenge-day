@@ -1,0 +1,44 @@
+{
+  "realm": "booleanuk-sso-challenge-day",
+  "enabled": true,
+  "accessTokenLifespan": 3600,
+  "roles": {
+    "realm": [
+      { "name": "USER", "description": "Access to private CRUD APIs" },
+      { "name": "ADMIN", "description": "Full access, including statistics APIs" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "sso-challenge-day",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["http://localhost:4000/*", "http://localhost:8080/*"],
+      "webOrigins": ["*"]
+    }
+  ],
+  "users": [
+    {
+      "username": "user",
+      "enabled": true,
+      "email": "user@example.com",
+      "emailVerified": true,
+      "firstName": "Reg",
+      "lastName": "User",
+      "credentials": [{ "type": "password", "value": "user", "temporary": false }],
+      "realmRoles": ["USER"]
+    },
+    {
+      "username": "admin",
+      "enabled": true,
+      "email": "admin@example.com",
+      "emailVerified": true,
+      "firstName": "Ada",
+      "lastName": "Admin",
+      "credentials": [{ "type": "password", "value": "admin", "temporary": false }],
+      "realmRoles": ["USER", "ADMIN"]
+    }
+  ]
+}

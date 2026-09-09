@@ -17,6 +17,35 @@ https://github.com/Guybrush3791/boolean-uk-1-fortnox-springboot-sso-challenge-da
 4. Copy `application.yaml.example` to `application.yml` and fill out your _database_ and _security_ connection details
 5. Check that `build.gradle` contains the correct dependencies and rerun gradle sync to make it all update
 
+## Quick start (local infra)
+
+```bash
+# 1. Postgres (localhost:4432) + Keycloak (localhost:8080) with the realm pre-imported
+docker compose up -d
+
+# 2. Config is already provided
+#    src/main/resources/application.yaml   (git-ignored, copied from the .example)
+
+# 3. Run the app (port 4000)
+./gradlew bootRun
+```
+
+Keycloak admin console: http://localhost:8080 (`admin` / `admin`).
+Realm `booleanuk-sso-challenge-day` ships with:
+- roles `USER`, `ADMIN`
+- public client `sso-challenge-day` (direct access grants enabled)
+- users `user` / `user` (USER) and `admin` / `admin` (USER + ADMIN)
+
+Get a token for testing private endpoints:
+
+```bash
+curl -s -X POST http://localhost:8080/realms/booleanuk-sso-challenge-day/protocol/openid-connect/token \
+  -d grant_type=password -d client_id=sso-challenge-day \
+  -d username=admin -d password=admin | jq -r .access_token
+```
+
+OpenAPI UI: http://localhost:4000/swagger-ui.html
+
 ## Activities
 ### Core
 #### Authentication
